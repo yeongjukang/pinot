@@ -496,11 +496,15 @@ public class OfflineClusterIntegrationTest extends BaseClusterIntegrationTestSet
         // Total docs should not change during reload, but num entries scanned
         // gets back to total number of documents as the index is removed.
         assertEquals(queryResponse.get("totalDocs").asLong(), numTotalDocs);
-        return queryResponse.get("numEntriesScannedInFilter").asLong() == numTotalDocs;
+
+        long actualTotalDocs = queryResponse.get("numEntriesScannedInFilter").asLong();
+        System.out.println("Expected: " + numTotalDocs + ", actual: " + actualTotalDocs);
+        return actualTotalDocs == numTotalDocs;
       } catch (Exception e) {
         throw new RuntimeException(e);
       }
     }, 600_000L, "Failed to cleanup obsolete index in table");
+
     // With force download, the table size gets back to the initial value.
     assertEquals(getTableSize(getTableName()), DISK_SIZE_IN_BYTES);
   }
@@ -791,6 +795,9 @@ public class OfflineClusterIntegrationTest extends BaseClusterIntegrationTestSet
         assertEquals(queryResponse.get("resultTable").get("rows").get(0).get(0).asInt(), secondQueryResult);
         // Total docs should not change during reload
         assertEquals(queryResponse.get("totalDocs").asLong(), numTotalDocs);
+
+        System.out.println("Expected: " + NUM_SEGMENTS + ", actual: " + queryResponse.get("numDocsScanned").asInt());
+
         // With star-tree, 'numDocsScanned' should be the same as number of segments (1 per segment)
         return queryResponse.get("numDocsScanned").asInt() == NUM_SEGMENTS;
       } catch (Exception e) {

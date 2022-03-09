@@ -118,14 +118,14 @@ public class SegmentMessageHandlerFactory implements MessageHandlerFactory {
     public HelixTaskResult handleMessage()
         throws InterruptedException {
       HelixTaskResult helixTaskResult = new HelixTaskResult();
-      _logger.info("Handling message: {}", _message);
+      System.out.println("Handling segment reload message: " + _message.toString());
+      _logger.info("Handling segment reload message: {}", _message);
       try {
         if (_segmentName.equals("")) {
           // NOTE: the method aborts if any segment reload encounters an unhandled exception,
           // and can lead to inconsistent state across segments.
           //we don't acquire any permit here as they'll be acquired by worked threads later
-          _instanceDataManager.reloadAllSegments(_tableNameWithType, _forceDownload,
-              _segmentRefreshSemaphore);
+          _instanceDataManager.reloadAllSegments(_tableNameWithType, _forceDownload, _segmentRefreshSemaphore);
         } else {
           // Reload one segment
           _segmentRefreshSemaphore.acquireSema(_segmentName, _logger);
